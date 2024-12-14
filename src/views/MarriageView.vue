@@ -42,8 +42,8 @@
 export default {
   data() {
     return {
-      brideName: "Alice",
-      groomName: "Bob",
+      brideName: "Sanjana",
+      groomName: "Max",
       weddingDate: "2024-12-31",
       venue: "Sunset Beach Resort",
       bridePhoto: "../assets/bride.jpeg",
@@ -66,7 +66,7 @@ export default {
   margin: 0 auto;
   text-align: center;
   background-color: white;
-  padding: 15px;
+  padding: 10px;
   border-radius: 10px;
   box-shadow: 0 4px 4px rgba(0, 0, 0, 0.1);
   color: #000000; /* Black text for a classic look */
