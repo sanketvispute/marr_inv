@@ -105,7 +105,7 @@ export default {
 
 .rsvp input {
   padding: 10px;
-  margin-right: 10px;
+  margin: 10px;
   border: 1px solid #ccc;
   border-radius: 4px;
 }
