@@ -2,7 +2,7 @@
   <div class="marriage-template">
     <div class="header">
       <h1>Wedding Invitation</h1>
-      <p>You're Invited!</p>
+      <p class="subtitle">You're Invited to Celebrate Love!</p>
     </div>
 
     <transition name="fade">
@@ -25,13 +25,32 @@
       <div class="rsvp">
         <h2>RSVP</h2>
         <form @submit.prevent="submitRSVP">
-          <input
-            v-model="guestName"
-            type="text"
-            placeholder="Your Name"
-            required
-          />
-          <button type="submit">Submit</button>
+          <div class="form-group">
+            <label for="name">Name:</label>
+            <input type="text" id="name" v-model="formData.name" required />
+          </div>
+          <div class="form-group">
+            <label for="email">Email:</label>
+            <input type="email" id="email" v-model="formData.email" required />
+          </div>
+          <div class="form-group">
+            <label for="contact">Contact Number:</label>
+            <input
+              type="tel"
+              id="contact"
+              v-model="formData.contact"
+              required
+            />
+          </div>
+          <div class="form-group">
+            <label for="meal">Meal Preference:</label>
+            <select id="meal" v-model="formData.meal" required>
+              <option value="vegetarian">Vegetarian</option>
+              <option value="non-vegetarian">Non-Vegetarian</option>
+              <option value="vegan">Vegan</option>
+            </select>
+          </div>
+          <button type="submit">Submit RSVP</button>
         </form>
       </div>
     </transition>
@@ -46,15 +65,42 @@ export default {
       groomName: "Max",
       weddingDate: "2024-12-31",
       venue: "Sunset Beach Resort",
-      bridePhoto: "../assets/bride.jpeg",
-      groomPhoto: "../assets/groom.jpg",
-      guestName: "",
+      formData: {
+        name: "",
+        email: "",
+        contact: "",
+        meal: "vegetarian",
+      },
     };
   },
   methods: {
-    submitRSVP() {
-      alert(`Thank you for your RSVP, ${this.guestName}!`);
-      this.guestName = ""; // Reset the form
+    async submitRSVP() {
+      try {
+        const response = await fetch("https://your-backend-api.com/rsvps", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(this.formData),
+        });
+        if (response.ok) {
+          alert("RSVP submitted successfully!");
+          this.resetForm();
+        } else {
+          alert("Failed to submit RSVP. Please try again.");
+        }
+      } catch (error) {
+        console.error("Error:", error);
+        alert("An error occurred while submitting the RSVP.");
+      }
+    },
+    resetForm() {
+      this.formData = {
+        name: "",
+        email: "",
+        contact: "",
+        meal: "vegetarian",
+      };
     },
   },
 };
@@ -62,20 +108,29 @@ export default {
 
 <style scoped>
 .marriage-template {
-  max-width: 600px;
-  margin: 0 auto;
-  text-align: center;
-  background-color: white;
-  padding: 10px;
-  border-radius: 10px;
-  box-shadow: 0 4px 4px rgba(0, 0, 0, 0.1);
-  color: #000000; /* Black text for a classic look */
-  margin-top: 20px;
+  max-width: 700px;
+  margin: 20px auto;
+  background-color: #ffffff;
+  padding: 20px;
+  border-radius: 15px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  color: #333333;
 }
 
 .header {
-  padding: 10px;
-  border-radius: 8px 8px 0 0;
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.header h1 {
+  font-size: 1.7em;
+  font-weight: 600;
+  margin: 0;
+}
+
+.subtitle {
+  font-size: 1em;
+  color: #9c27b0;
 }
 
 .photo-section {
@@ -85,42 +140,74 @@ export default {
 }
 
 .photo {
-  width: 100px;
-  height: 100px;
+  width: 120px;
+  height: 120px;
   border-radius: 50%;
-  margin: 0 10px;
-  border: 3px solid #9c27b0; /* Violet border for a subtle highlight */
+  margin: 0 15px;
+  border: 5px solid #9c27b0;
   object-fit: cover;
 }
 
+.details {
+  text-align: center;
+  font-size: 1.1em;
+  color: #555555;
+}
+
 .details p {
-  font-size: 1.2em;
-  margin: 5px 0;
-  color: #000000; /* Ensure text is black */
+  margin: 10px 0;
 }
 
-.rsvp form {
-  margin-top: 20px;
+.rsvp {
+  margin-top: 30px;
 }
 
-.rsvp input {
+.rsvp h2 {
+  text-align: center;
+  color: #9c27b0;
+  font-size: 1.8em;
+  margin-bottom: 20px;
+}
+
+.form-group {
+  margin-bottom: 15px;
+}
+
+.form-group label {
+  display: block;
+  font-size: 1em;
+  margin-bottom: 5px;
+  color: #333333;
+}
+
+.form-group input,
+.form-group select {
+  width: calc(100% - 20px);
   padding: 10px;
-  margin: 10px;
-  border: 1px solid #ccc;
-  border-radius: 4px;
+  border: 1px solid #cccccc;
+  border-radius: 5px;
+  font-size: 1em;
 }
 
-.rsvp button {
-  padding: 10px 15px;
-  background-color: #9c27b0; /* Violet background for button */
-  border: none;
+.form-group input:focus,
+.form-group select:focus {
+  outline-color: #9c27b0;
+}
+
+button {
+  width: 100%;
+  padding: 10px;
+  font-size: 1.2em;
+  background-color: #9c27b0;
   color: white;
-  border-radius: 4px;
+  border: none;
+  border-radius: 5px;
   cursor: pointer;
+  transition: background-color 0.3s;
 }
 
-.rsvp button:hover {
-  background-color: #7b1fa2; /* Darker violet on hover */
+button:hover {
+  background-color: #7b1fa2;
 }
 
 /* Animations */
