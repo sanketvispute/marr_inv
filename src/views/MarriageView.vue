@@ -50,6 +50,14 @@
               <option value="vegan">Vegan</option>
             </select>
           </div>
+
+          <!-- reCAPTCHA Widget -->
+          <div
+            id="recaptcha"
+            class="g-recaptcha"
+            data-sitekey="6LfpoJ4qAAAAACHaEsBVg_BHGUOws0Ql2bNNYzUP"
+          ></div>
+
           <button type="submit">Submit RSVP</button>
         </form>
       </div>
@@ -58,7 +66,12 @@
 </template>
 
 <script>
+import VueRecaptcha from "vue-recaptcha";
+
 export default {
+  components: {
+    VueRecaptcha,
+  },
   data() {
     return {
       brideName: "Sanjana",
@@ -71,29 +84,78 @@ export default {
         contact: "",
         meal: "vegetarian",
       },
+      captchaResponse: "",
     };
   },
+  mounted() {
+    this.loadRecaptcha();
+  },
+  // mounted() {
+  //   this.getRSVP();
+  // },
   methods: {
+    loadRecaptcha() {
+      if (window.grecaptcha) {
+        // Render the reCAPTCHA widget
+        grecaptcha.render("recaptcha", {
+          sitekey: "6LfpoJ4qAAAAACHaEsBVg_BHGUOws0Ql2bNNYzUP",
+          callback: this.onCaptchaSuccess, // Called when CAPTCHA is solved
+          "expired-callback": this.onCaptchaExpired, // Optional callback
+        });
+      } else {
+        console.error("reCAPTCHA script not loaded");
+      }
+    },
+    onCaptchaSuccess(token) {
+      console.log("CAPTCHA solved, token:", token);
+      this.captchaResponse = token; // Save the token
+    },
+    onCaptchaExpired() {
+      console.log("CAPTCHA expired");
+      this.captchaResponse = ""; // Reset token
+    },
     async submitRSVP() {
       try {
-        const response = await fetch("https://your-backend-api.com/rsvps", {
+        const captchaResponse = grecaptcha.getResponse();
+        if (!captchaResponse) {
+          alert("Please complete the CAPTCHA");
+          return;
+        }
+        const response = await fetch("http://localhost:5000/", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify(this.formData),
+          body: JSON.stringify({
+            ...this.formData,
+            captchaResponse: this.captchaResponse,
+          }),
         });
         if (response.ok) {
           alert("RSVP submitted successfully!");
           this.resetForm();
         } else {
           alert("Failed to submit RSVP. Please try again.");
+          throw new Error("Something went wrong to submit RSVP");
         }
       } catch (error) {
         console.error("Error:", error);
         alert("An error occurred while submitting the RSVP.");
       }
     },
+    // async getRSVP() {
+    //   try {
+    //     const response = await fetch("http://localhost:5000/");
+    //     if (!response.ok) {
+    //       throw new Error("Something went wrong with fetch RSPV");
+    //     } else {
+    //       const data = await response.json();
+    //       console.log("data", data);
+    //     }
+    //   } catch (err) {
+    //     console.log("error", err);
+    //   }
+    // },
     resetForm() {
       this.formData = {
         name: "",
@@ -107,6 +169,13 @@ export default {
 </script>
 
 <style scoped>
+#recaptcha {
+  display: flex;
+  justify-content: center; /* Center the widget horizontally */
+  margin: 15px 0; /* Add spacing above and below */
+  transform: scale(0.9); /* Scale down the widget */
+  transform-origin: center; /* Keep the scaling centered */
+}
 .marriage-template {
   max-width: 700px;
   margin: 20px auto;
@@ -182,7 +251,7 @@ export default {
 
 .form-group input,
 .form-group select {
-  width: calc(100% - 20px);
+  width: 100%;
   padding: 10px;
   border: 1px solid #cccccc;
   border-radius: 5px;
