@@ -120,12 +120,14 @@ export default {
       alert("The CAPTCHA has expired. Please solve it again.");
     },
     async submitRSVP() {
-      if (!this.captchaResponse) {
-        alert("Please complete the CAPTCHA before submitting.");
-        return;
-      }
-
       try {
+        const get_captchaResponse = grecaptcha.getResponse();
+        if (!get_captchaResponse) {
+          alert("Please complete the CAPTCHA");
+          return;
+        }
+        this.captchaResponse = get_captchaResponse;
+
         const response = await fetch("https://eventapi-hjb8.onrender.com/", {
           method: "POST",
           headers: {
