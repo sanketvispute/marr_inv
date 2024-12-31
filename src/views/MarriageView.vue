@@ -121,7 +121,7 @@ export default {
     },
     async submitRSVP() {
       try {
-        const get_captchaResponse = grecaptcha.getResponse();
+        const get_captchaResponse = await grecaptcha.getResponse();
         if (!get_captchaResponse) {
           alert("Please complete the CAPTCHA");
           return;
