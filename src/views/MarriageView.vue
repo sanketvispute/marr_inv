@@ -114,17 +114,17 @@ export default {
     },
     onCaptchaExpired() {
       console.log("CAPTCHA expired");
-      this.captchaResponse = "";
+      this.captchaResponse = ""; // Reset token
       grecaptcha.reset(); // Reset the CAPTCHA widget
       alert("The CAPTCHA has expired. Please solve it again.");
     },
     async submitRSVP() {
-      if (!this.captchaResponse) {
-        alert("Please complete the CAPTCHA before submitting.");
-        return;
-      }
-
       try {
+        const captchaResponse = grecaptcha.getResponse();
+        if (!captchaResponse) {
+          alert("Please complete the CAPTCHA");
+          return;
+        }
         const response = await fetch(import.meta.env.VITE_BACKEND_URL, {
           method: "POST",
           headers: {
