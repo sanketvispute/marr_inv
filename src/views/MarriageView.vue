@@ -67,7 +67,6 @@
 
 <script>
 import VueRecaptcha from "vue-recaptcha";
-
 export default {
   components: {
     VueRecaptcha,
@@ -108,20 +107,25 @@ export default {
     },
     onCaptchaSuccess(token) {
       console.log("CAPTCHA solved, token:", token);
-      this.captchaResponse = token; // Save the token
+      if (!token) {
+        console.error("CAPTCHA token is empty.");
+      }
+      this.captchaResponse = token; // Assign token
     },
     onCaptchaExpired() {
       console.log("CAPTCHA expired");
-      this.captchaResponse = ""; // Reset token
+      this.captchaResponse = "";
+      grecaptcha.reset(); // Reset the CAPTCHA widget
+      alert("The CAPTCHA has expired. Please solve it again.");
     },
     async submitRSVP() {
+      if (!this.captchaResponse) {
+        alert("Please complete the CAPTCHA before submitting.");
+        return;
+      }
+
       try {
-        const captchaResponse = grecaptcha.getResponse();
-        if (!captchaResponse) {
-          alert("Please complete the CAPTCHA");
-          return;
-        }
-        const response = await fetch("http://localhost:5000/", {
+        const response = await fetch(import.meta.env.VITE_BACKEND_URL, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -131,18 +135,20 @@ export default {
             captchaResponse: this.captchaResponse,
           }),
         });
+
         if (response.ok) {
           alert("RSVP submitted successfully!");
           this.resetForm();
+          grecaptcha.reset(); // Reset CAPTCHA after successful submission
         } else {
           alert("Failed to submit RSVP. Please try again.");
-          throw new Error("Something went wrong to submit RSVP");
         }
       } catch (error) {
-        console.error("Error:", error);
+        console.error("Error submitting RSVP:", error);
         alert("An error occurred while submitting the RSVP.");
       }
     },
+
     // async getRSVP() {
     //   try {
     //     const response = await fetch("http://localhost:5000/");
