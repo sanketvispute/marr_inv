@@ -125,7 +125,7 @@ export default {
           alert("Please complete the CAPTCHA");
           return;
         }
-        const response = await fetch(import.meta.env.VITE_BACKEND_URL, {
+        const response = await fetch("https://eventapi-hjb8.onrender.com/", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
