@@ -67,6 +67,7 @@
 
 <script>
 import VueRecaptcha from "vue-recaptcha";
+
 export default {
   components: {
     VueRecaptcha,
@@ -114,17 +115,17 @@ export default {
     },
     onCaptchaExpired() {
       console.log("CAPTCHA expired");
-      this.captchaResponse = ""; // Reset token
+      this.captchaResponse = "";
       grecaptcha.reset(); // Reset the CAPTCHA widget
       alert("The CAPTCHA has expired. Please solve it again.");
     },
     async submitRSVP() {
+      if (!this.captchaResponse) {
+        alert("Please complete the CAPTCHA before submitting.");
+        return;
+      }
+
       try {
-        const captchaResponse = grecaptcha.getResponse();
-        if (!captchaResponse) {
-          alert("Please complete the CAPTCHA");
-          return;
-        }
         const response = await fetch("https://eventapi-hjb8.onrender.com/", {
           method: "POST",
           headers: {
