@@ -128,7 +128,8 @@ export default {
         }
         this.captchaResponse = get_captchaResponse;
 
-        const response = await fetch("https://eventapi-hjb8.onrender.com/", {
+        const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
+        const response = await fetch(BACKEND_URL, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
